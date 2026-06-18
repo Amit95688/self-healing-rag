@@ -50,11 +50,20 @@ jobs:
         id: run_eval
         if: steps.revert_check.outputs.is_revert == 'false'
         run: |
-          python test.py \
-            --questions eval_questions.json \
-            --pipeline-module src.graph \
-            --min-pass-rate 0.8 \
-            --output eval_results.json
+          # Only pass --min-pass-rate when the script supports it (avoid CI failures
+          # for older commits that don't include the flag).
+          if python test.py --help 2>/dev/null | grep -q -- '--min-pass-rate'; then
+            python test.py \
+              --questions eval_questions.json \
+              --pipeline-module src.graph \
+              --min-pass-rate 0.8 \
+              --output eval_results.json
+          else
+            python test.py \
+              --questions eval_questions.json \
+              --pipeline-module src.graph \
+              --output eval_results.json
+          fi
         continue-on-error: true
 
       - name: Upload eval results artifact
