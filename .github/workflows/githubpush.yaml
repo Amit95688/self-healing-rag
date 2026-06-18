@@ -1,0 +1,89 @@
+name: SentinelRAG Eval Gate
+
+on:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: write
+
+jobs:
+  eval-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if this commit is itself a revert
+        id: revert_check
+        run: |
+          MSG=$(git log -1 --pretty=%B)
+          if [[ "$MSG" == Revert\ \"* ]]; then
+            echo "is_revert=true" >> "$GITHUB_OUTPUT"
+            echo "This commit is a revert. Skipping eval to avoid a revert loop."
+          else
+            echo "is_revert=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Python
+        if: steps.revert_check.outputs.is_revert == 'false'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        if: steps.revert_check.outputs.is_revert == 'false'
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            echo "WARNING: requirements.txt not found."
+          fi
+
+      - name: Run eval
+        id: run_eval
+        if: steps.revert_check.outputs.is_revert == 'false'
+        run: |
+          python test.py \
+            --questions eval_questions.json \
+            --pipeline-module src.graph \
+            --min-pass-rate 0.8 \
+            --output eval_results.json
+        continue-on-error: true
+
+      - name: Upload eval results artifact
+        if: always() && steps.revert_check.outputs.is_revert == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-${{ github.sha }}
+          path: eval_results.json
+          if-no-files-found: ignore
+
+      - name: Revert this commit if eval failed
+        if: steps.revert_check.outputs.is_revert == 'false' && steps.run_eval.outcome == 'failure'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          echo "Eval pass rate was below 80%. Reverting commit ${{ github.sha }}..."
+
+          if git revert --no-edit "${{ github.sha }}"; then
+            git push origin "HEAD:${{ github.ref_name }}"
+            echo "Reverted and pushed."
+          else
+            echo "::error::git revert failed. Manual intervention required."
+            git revert --abort || true
+            exit 1
+          fi
+
+      - name: Fail the job if eval did not pass
+        if: steps.revert_check.outputs.is_revert == 'false' && steps.run_eval.outcome == 'failure'
+        run: |
+          echo "::error::Eval pass rate was below the threshold."
+          exit 1

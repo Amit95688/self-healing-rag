@@ -1,0 +1,10 @@
+langchain-openai
+langchain-huggingface
+langchain-community
+langchain-classic
+langchain-text-splitters
+langgraph
+python-dotenv
+faiss-cpu
+sentence-transformers
+ddgs

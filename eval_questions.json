@@ -1,0 +1,384 @@
+[
+  {
+    "id": "q1",
+    "question": "What is accuracy?",
+    "ground_truth": "The proportion of correct predictions.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q2",
+    "question": "What is precision?",
+    "ground_truth": "The proportion of predicted positives that are truly positive.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q3",
+    "question": "What is recall?",
+    "ground_truth": "The proportion of actual positives correctly identified.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q4",
+    "question": "What is F1 score?",
+    "ground_truth": "The harmonic mean of precision and recall.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q5",
+    "question": "What is a confusion matrix?",
+    "ground_truth": "A table summarizing classification outcomes.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q6",
+    "question": "Compare precision and recall.",
+    "ground_truth": "Precision measures correctness of positive predictions, recall measures coverage of actual positives.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q7",
+    "question": "Why is cross validation used?",
+    "ground_truth": "To obtain a more reliable estimate of model performance.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q8",
+    "question": "What is data leakage?",
+    "ground_truth": "When information from outside the training process influences the model.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q9",
+    "question": "What is ROC-AUC?",
+    "ground_truth": "A metric measuring ranking performance across classification thresholds.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q10",
+    "question": "Who invented machine learning in 1895?",
+    "ground_truth": "Answer not found in documents.",
+    "expects_refusal": true,
+    "question_type": "refusal"
+  },
+  {
+    "id": "q11",
+    "question": "What is regularization?",
+    "ground_truth": "A technique that constrains or penalizes model complexity to reduce overfitting.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q12",
+    "question": "What is the difference between L1 and L2 regularization?",
+    "ground_truth": "L1 (Lasso) penalizes the absolute value of weights and can drive some to zero, producing sparse models; L2 (Ridge) penalizes the squared value of weights and shrinks them smoothly without forcing sparsity.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q13",
+    "question": "What is gradient descent?",
+    "ground_truth": "An optimization algorithm that iteratively adjusts parameters in the direction that reduces a loss function.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q14",
+    "question": "What is a learning rate?",
+    "ground_truth": "A hyperparameter controlling the step size taken during each iteration of gradient-based optimization.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q15",
+    "question": "What is backpropagation?",
+    "ground_truth": "An algorithm that computes gradients of the loss with respect to network weights by propagating errors backward through the layers.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q16",
+    "question": "What is a convolutional neural network used for?",
+    "ground_truth": "Processing grid-like data such as images, using convolutional filters to detect spatial patterns.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q17",
+    "question": "What is overfitting?",
+    "ground_truth": "When a model fits the training data too closely, including its noise, and fails to generalize to new data.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q18",
+    "question": "What is a hyperparameter?",
+    "ground_truth": "A configuration value set before training that controls the learning process, as opposed to a parameter learned from data.",
+    "expects_refusal": false,
+    "question_type": "factual"
+  },
+  {
+    "id": "q19",
+    "question": "That thing where the model does great on training but falls apart later, what's that called and how do you stop it?",
+    "ground_truth": "Overfitting; addressed through techniques such as regularization, more training data, simplifying the model, or early stopping.",
+    "expects_refusal": false,
+    "question_type": "vague",
+    "note": "Vague, conversational phrasing of a standard concept. Tests whether query rewriting normalizes this into a retrievable form."
+  },
+  {
+    "id": "q20",
+    "question": "How do you know if your model is actually good or if you just got lucky with the split?",
+    "ground_truth": "Use cross validation to obtain a more reliable performance estimate that is less dependent on any single train/test split.",
+    "expects_refusal": false,
+    "question_type": "vague",
+    "note": "Indirect phrasing of the cross-validation motivation question."
+  },
+  {
+    "id": "q21",
+    "question": "Why does my model think everything is the majority class?",
+    "ground_truth": "Likely due to class imbalance, where the model achieves high accuracy by simply predicting the dominant class; precision, recall, and F1 are more informative metrics in this case.",
+    "expects_refusal": false,
+    "question_type": "vague",
+    "note": "Symptom-based question requiring the system to infer the underlying concept (class imbalance) rather than matching keywords directly."
+  },
+  {
+    "id": "q22",
+    "question": "What's the deal with picking the right threshold for a classifier?",
+    "ground_truth": "The classification threshold determines the tradeoff between precision and recall; ROC-AUC and precision-recall curves are commonly used to evaluate performance across different thresholds.",
+    "expects_refusal": false,
+    "question_type": "vague",
+    "note": "Casual phrasing connecting threshold selection to ROC-AUC and precision/recall tradeoffs."
+  },
+  {
+    "id": "q23",
+    "question": "My training loss is going down but my validation loss is going up, what's happening?",
+    "ground_truth": "This is a classic sign of overfitting: the model is fitting noise in the training set rather than learning generalizable patterns.",
+    "expects_refusal": false,
+    "question_type": "vague",
+    "note": "Diagnostic scenario phrasing rather than a direct definitional question."
+  },
+  {
+    "id": "q24",
+    "question": "Is there a way to make the model not rely so heavily on any one feature?",
+    "ground_truth": "Regularization techniques such as L1 or L2 penalties discourage the model from assigning excessive weight to any single feature.",
+    "expects_refusal": false,
+    "question_type": "vague",
+    "note": "Indirect approach to regularization, phrased as a goal rather than naming the technique."
+  },
+  {
+    "id": "q25",
+    "question": "What should I do if my model trains fine but does badly on totally new data it hasn't seen?",
+    "ground_truth": "This indicates poor generalization, often due to overfitting; potential fixes include regularization, more diverse training data, simpler models, or better validation procedures.",
+    "expects_refusal": false,
+    "question_type": "vague",
+    "note": "Practitioner-style troubleshooting phrasing."
+  },
+  {
+    "id": "q26",
+    "question": "How come adding more layers doesn't always make the network better?",
+    "ground_truth": "Deeper networks can suffer from issues such as vanishing gradients, overfitting, or increased difficulty in optimization, so additional depth does not guarantee improved performance.",
+    "expects_refusal": false,
+    "question_type": "vague",
+    "note": "Open-ended conceptual question about depth versus performance in neural networks."
+  },
+  {
+    "id": "q27",
+    "question": "What's the trick for handling data that's missing a bunch of values?",
+    "ground_truth": "Common approaches include imputation (filling missing values with means, medians, or model-based estimates), removing affected rows or columns, or using algorithms that natively handle missing data.",
+    "expects_refusal": false,
+    "question_type": "vague",
+    "note": "Casual phrasing of a data preprocessing question."
+  },
+  {
+    "id": "q28",
+    "question": "Both D2L and Hands-On Machine Learning discuss the bias-variance tradeoff. How does each book frame the relationship between model complexity and generalization error?",
+    "ground_truth": "Both books describe generalization error as decomposable into bias and variance components, where increasing model complexity tends to reduce bias but increase variance, and vice versa; the optimal model complexity balances the two to minimize total generalization error.",
+    "expects_refusal": false,
+    "question_type": "multi_hop",
+    "note": "Requires synthesizing content attributed to both source PDFs on the same underlying concept."
+  },
+  {
+    "id": "q29",
+    "question": "Hands-On Machine Learning covers Scikit-Learn's approach to cross-validation, and D2L covers it from a more theoretical deep learning perspective. What do the two treatments have in common?",
+    "ground_truth": "Both treatments agree that cross-validation provides a more robust estimate of model performance than a single train/test split, reducing the risk of an estimate being skewed by how the data happened to be divided.",
+    "expects_refusal": false,
+    "question_type": "multi_hop",
+    "note": "Cross-PDF synthesis question on cross-validation, connecting practical (Scikit-Learn) and theoretical (D2L) framings."
+  },
+  {
+    "id": "q30",
+    "question": "How does the regularization approach described in Hands-On Machine Learning relate to the weight decay concept covered in D2L?",
+    "ground_truth": "Weight decay, as discussed in D2L, is mathematically equivalent to L2 regularization as covered in Hands-On Machine Learning -- both add a penalty proportional to the squared magnitude of the weights to the loss function to discourage overly large parameter values.",
+    "expects_refusal": false,
+    "question_type": "multi_hop",
+    "note": "Tests whether retrieval connects two differently-named but equivalent concepts across the two source texts."
+  },
+  {
+    "id": "q31",
+    "question": "Does the gradient descent explanation in D2L align with how Hands-On Machine Learning describes optimizing a Scikit-Learn model?",
+    "ground_truth": "Both describe gradient descent as iteratively updating parameters in the direction that reduces the loss function, though D2L tends to frame it in terms of deep learning optimization while Hands-On Machine Learning frames it in the context of classical models and Scikit-Learn's implementation.",
+    "expects_refusal": false,
+    "question_type": "multi_hop",
+    "note": "Requires comparing framing/emphasis across both books on the same algorithm."
+  },
+  {
+    "id": "q32",
+    "question": "Compare how D2L and Hands-On Machine Learning each explain the purpose of an activation function in a neural network.",
+    "ground_truth": "Both describe activation functions as introducing non-linearity into a neural network, enabling it to model complex relationships that a purely linear model could not capture.",
+    "expects_refusal": false,
+    "question_type": "multi_hop",
+    "note": "Cross-PDF comparison on a neural network fundamentals topic."
+  },
+  {
+    "id": "q33",
+    "question": "Hands-On Machine Learning discusses decision trees and D2L discusses neural networks. Do either of the books connect these two model types when discussing overfitting?",
+    "ground_truth": "Both model types are discussed as susceptible to overfitting, with decision trees prone to overfitting when grown too deep, and neural networks prone to overfitting when overly large relative to the amount of training data; both books generally recommend regularization or complexity control as mitigation.",
+    "expects_refusal": false,
+    "question_type": "multi_hop",
+    "note": "Connects two different model families across both books through a shared failure mode."
+  },
+  {
+    "id": "q34",
+    "question": "What do D2L and Hands-On Machine Learning each say about why we evaluate models on a held-out test set rather than the training set?",
+    "ground_truth": "Both emphasize that evaluating on training data gives an overly optimistic and misleading estimate of performance, since the model has already seen that data; a held-out test set better approximates performance on genuinely unseen data.",
+    "expects_refusal": false,
+    "question_type": "multi_hop",
+    "note": "Cross-PDF question on a foundational evaluation methodology concept."
+  },
+  {
+    "id": "q35",
+    "question": "How does the concept of a hyperparameter in Hands-On Machine Learning's Scikit-Learn examples compare to how D2L treats hyperparameters in deep learning?",
+    "ground_truth": "Both treat hyperparameters as values set prior to training that are not learned from data but instead chosen via search or tuning processes, distinguishing them from model parameters that are learned during training.",
+    "expects_refusal": false,
+    "question_type": "multi_hop",
+    "note": "Cross-PDF synthesis on the parameter vs. hyperparameter distinction."
+  },
+  {
+    "id": "q36",
+    "question": "Improve the model's performance.",
+    "ground_truth": "Ambiguous: could refer to improving accuracy, reducing overfitting, reducing training time, improving generalization, or improving a specific metric such as recall on a minority class. No single correct answer without further context.",
+    "expects_refusal": false,
+    "question_type": "ambiguous",
+    "note": "No ground truth in the strict sense -- multiple valid interpretations exist. A good response should ask for clarification or address the most common interpretations rather than assume one."
+  },
+  {
+    "id": "q37",
+    "question": "Is more data always better?",
+    "ground_truth": "Ambiguous: generally yes for reducing variance and improving generalization, but more data does not help if it is low quality, mislabeled, or irrelevant to the task, and can increase training cost without improving performance.",
+    "expects_refusal": false,
+    "question_type": "ambiguous",
+    "note": "Reasonable to answer either 'yes, with caveats' or 'it depends' -- tests whether the system oversimplifies a genuinely conditional answer."
+  },
+  {
+    "id": "q38",
+    "question": "Which is more important, precision or recall?",
+    "ground_truth": "Ambiguous: depends entirely on the application -- false positives may be more costly in some contexts (favoring precision) while false negatives may be more costly in others (favoring recall). Neither is universally more important.",
+    "expects_refusal": false,
+    "question_type": "ambiguous",
+    "note": "Tests whether the system gives a context-dependent answer rather than picking one side as a universal rule."
+  },
+  {
+    "id": "q39",
+    "question": "Should I use a deep learning model or a simpler model for my problem?",
+    "ground_truth": "Ambiguous: depends on factors such as dataset size, problem complexity, interpretability requirements, and available compute -- neither book asserts that one is universally preferable.",
+    "expects_refusal": false,
+    "question_type": "ambiguous",
+    "note": "Open-ended model selection question with no single correct answer absent more context about the task."
+  },
+  {
+    "id": "q40",
+    "question": "Is a high accuracy score a sign of a good model?",
+    "ground_truth": "Ambiguous/conditional: accuracy can be misleading on imbalanced datasets, where a high score may simply reflect predicting the majority class; whether it indicates a good model depends on class balance and the cost of different error types.",
+    "expects_refusal": false,
+    "question_type": "ambiguous",
+    "note": "Tests whether the system flags the imbalanced-data caveat rather than treating high accuracy as unconditionally good."
+  },
+  {
+    "id": "q41",
+    "question": "What's the best machine learning algorithm?",
+    "ground_truth": "Ambiguous: no universally best algorithm exists; performance depends on the dataset, task, and constraints.",
+    "expects_refusal": false,
+    "question_type": "ambiguous",
+    "note": "Classic open-ended question testing whether the system avoids declaring one algorithm definitively best."
+  },
+  {
+    "id": "q42",
+    "question": "Do I need to normalize my data before training?",
+    "ground_truth": "Ambiguous/conditional: depends on the algorithm -- distance-based and gradient-based methods (e.g. k-NN, neural networks, gradient descent-optimized models) generally benefit from normalization, while tree-based methods are largely invariant to feature scaling.",
+    "expects_refusal": false,
+    "question_type": "ambiguous",
+    "note": "Tests whether the system gives a conditional, algorithm-dependent answer rather than a blanket yes or no."
+  },
+  {
+    "id": "q43",
+    "question": "Which programming language did Andrew Ng use to personally rewrite the Hands-On Machine Learning textbook in 2003?",
+    "ground_truth": "Answer not found in documents.",
+    "expects_refusal": true,
+    "question_type": "refusal",
+    "note": "False premise: fabricated claim about a real, well-known figure attached to events involving these books that did not happen, and predates the books' actual publication."
+  },
+  {
+    "id": "q44",
+    "question": "What does the 'Q-divergence coefficient' measure in a classification model?",
+    "ground_truth": "Answer not found in documents.",
+    "expects_refusal": true,
+    "question_type": "refusal",
+    "note": "Fabricated technical terminology that sounds plausible but does not correspond to a real, standard ML metric."
+  },
+  {
+    "id": "q45",
+    "question": "Why did the original RAG paper recommend using ROC-AUC instead of BLEU score for evaluating chatbots, according to these textbooks?",
+    "ground_truth": "Answer not found in documents.",
+    "expects_refusal": true,
+    "question_type": "refusal",
+    "note": "False premise embedding a fabricated claim and mismatched evaluation metrics -- tests whether the system catches a technically-incoherent premise rather than just a factually false one."
+  },
+  {
+    "id": "q46",
+    "question": "What grade did the author of D2L give to PyTorch in their internal benchmarking notes included in the appendix?",
+    "ground_truth": "Answer not found in documents.",
+    "expects_refusal": true,
+    "question_type": "refusal",
+    "note": "Fabricated specific detail designed to sound plausible but does not exist in the source text."
+  },
+  {
+    "id": "q47",
+    "question": "How many qubits are required to train the neural network architectures described in these books?",
+    "ground_truth": "Answer not found in documents.",
+    "expects_refusal": true,
+    "question_type": "refusal",
+    "note": "Out-of-scope but adjacent-sounding: quantum computing terminology applied to classical ML content with no quantum computing component."
+  },
+  {
+    "id": "q48",
+    "question": "What was the average stock price of Nvidia during the week these two textbooks were first published?",
+    "ground_truth": "Answer not found in documents.",
+    "expects_refusal": true,
+    "question_type": "refusal",
+    "note": "Entirely unrelated domain (financial data) with no plausible connection to ML textbook content."
+  },
+  {
+    "id": "q49",
+    "question": "According to D2L, what is the recommended dosage of caffeine for optimizing late-night training runs?",
+    "ground_truth": "Answer not found in documents.",
+    "expects_refusal": true,
+    "question_type": "refusal",
+    "note": "Absurd premise mixing an unrelated domain (health/dosage) with a plausible-sounding ML context -- tests whether wordplay-adjacent phrasing still triggers refusal correctly."
+  },
+  {
+    "id": "q50",
+    "question": "Which chapter of Hands-On Machine Learning was ghostwritten by GPT-2, as disclosed in the book's errata?",
+    "ground_truth": "Answer not found in documents.",
+    "expects_refusal": true,
+    "question_type": "refusal",
+    "note": "False premise involving a real but unrelated AI system and a fabricated disclosure event -- tests whether name-dropping a real, recognizable AI term increases the chance of false confident generation."
+  }
+]
