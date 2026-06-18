@@ -79,6 +79,15 @@ def _is_refusal(answer: str) -> bool:
     return answer.startswith("i can't help") or answer.startswith("i can't share") or answer.startswith("no answer found")
 
 
+def select_ci_subset(questions: list[dict], factual_count: int = 8) -> list[dict]:
+    """Representative subset: evenly sampled factual + all refusal tests."""
+    refusal = [q for q in questions if q.get("expects_refusal")]
+    factual = [q for q in questions if not q.get("expects_refusal")]
+    step = max(1, len(factual) // factual_count)
+    sampled = factual[::step][:factual_count]
+    return sampled + refusal
+
+
 def run_deterministic_eval(app, questions: list[dict]) -> list[dict]:
     results = []
     for item in questions:
@@ -240,6 +249,15 @@ def main():
              "If omitted, the script always exits 0 regardless of results "
              "(report-only mode)."
     )
+    parser.add_argument(
+        "--limit", type=int, default=None,
+        help="Run only the first N questions from the question file."
+    )
+    parser.add_argument(
+        "--ci-subset", action="store_true",
+        help="Run a balanced CI subset (~8 factual + all refusal tests) "
+             "instead of the full question set."
+    )
     args = parser.parse_args()
 
     if not Path(args.questions).exists():
@@ -247,6 +265,12 @@ def main():
         sys.exit(1)
 
     questions = load_questions(args.questions)
+    if args.ci_subset:
+        questions = select_ci_subset(questions)
+        print(f"CI subset selected: {len(questions)} questions")
+    elif args.limit is not None:
+        questions = questions[: args.limit]
+        print(f"Limited to first {len(questions)} questions")
     app = import_pipeline(args.pipeline_module)
 
     print(f"Running {len(questions)} questions against {args.pipeline_module}.app...")

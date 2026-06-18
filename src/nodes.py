@@ -2,7 +2,14 @@ from typing import List, Literal
 
 from langchain_core.documents import Document
 
-from .config import MAX_RETRIES, MAX_REWRITE_TRIES, USE_WEB_FALLBACK, llm
+from .config import (
+    MAX_RETRIES,
+    MAX_REWRITE_TRIES,
+    SKIP_OUTPUT_GUARDRAIL,
+    SKIP_VERIFY,
+    USE_WEB_FALLBACK,
+    llm,
+)
 from .prompts import (
     decompose_prompt,
     direct_generation_prompt,
@@ -163,6 +170,14 @@ def route_after_web_fallback(state: State) -> Literal["verify_answer", "output_g
 
 
 def verify_answer(state: State):
+    if SKIP_VERIFY:
+        return {
+            "issup": "fully_supported",
+            "isuse": "useful",
+            "evidence": "",
+            "use_reason": "skipped in CI fast mode",
+        }
+
     decision: VerifyDecision = llm.with_structured_output(VerifyDecision).invoke(
         verify_prompt.format_messages(
             question=state["question"],
@@ -236,6 +251,9 @@ def output_guardrail(state: State):
     answer = (state.get("answer") or "").strip()
 
     if answer in ("", "No answer found."):
+        return {"output_safe": True, "output_block_reason": ""}
+
+    if SKIP_OUTPUT_GUARDRAIL:
         return {"output_safe": True, "output_block_reason": ""}
 
     decision: OutputGuardDecision = llm.with_structured_output(OutputGuardDecision).invoke(

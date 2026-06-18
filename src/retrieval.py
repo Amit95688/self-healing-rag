@@ -9,7 +9,7 @@ from langchain_classic.retrievers import EnsembleRetriever
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from .config import CHUNKS_PATH, INDEX_PATH, RERANK_MIN_SCORE, TOP_N_RELEVANT, embeddings
+from .config import CHUNKS_PATH, INDEX_PATH, CI_MODE, RERANK_MIN_SCORE, TOP_N_RELEVANT, embeddings
 
 PDF_PATHS = [
     "./data/250153.pdf",
@@ -117,7 +117,8 @@ def rerank_documents(question: str, docs: Sequence[Document]) -> List[Document]:
     scores = reranker_model.predict(pairs)
     scored_docs = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)
 
-    print("  rerank top scores:", [round(float(score), 2) for _, score in scored_docs[:5]])
+    if not CI_MODE:
+        print("  rerank top scores:", [round(float(score), 2) for _, score in scored_docs[:5]])
 
     relevant_docs = [doc for doc, score in scored_docs if score >= RERANK_MIN_SCORE][:TOP_N_RELEVANT]
     return relevant_docs

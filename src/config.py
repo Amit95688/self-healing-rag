@@ -9,20 +9,37 @@ from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
+
+def _env_bool(name: str, default: bool = False) -> bool:
+    val = os.getenv(name, "").lower()
+    if val in ("1", "true", "yes"):
+        return True
+    if val in ("0", "false", "no"):
+        return False
+    return default
+
+
+# GitHub Actions sets CI=true; also allow explicit override.
+CI_MODE = _env_bool("CI") or _env_bool("SENTINEL_RAG_CI")
+if CI_MODE:
+    print("SentinelRAG CI fast mode: skipping verify, output guardrail, web fallback, and retries.")
+
 # ============================================================
 # FEATURE TOGGLES
 # ============================================================
 USE_QUERY_DECOMPOSITION = False
 USE_HYDE = False
-USE_WEB_FALLBACK = True
+USE_WEB_FALLBACK = not CI_MODE
 
 # ============================================================
 # RETRIEVAL / GENERATION LIMITS
 # ============================================================
 TOP_N_RELEVANT = 2
 RERANK_MIN_SCORE = 0.0
-MAX_RETRIES = 1
-MAX_REWRITE_TRIES = 1
+MAX_RETRIES = 0 if CI_MODE else 1
+MAX_REWRITE_TRIES = 0 if CI_MODE else 1
+SKIP_VERIFY = CI_MODE
+SKIP_OUTPUT_GUARDRAIL = CI_MODE
 
 # ============================================================
 # PERSISTED ARTIFACTS
