@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import List, Sequence, Tuple
 
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.retrievers import BM25Retriever
 from langchain_community.vectorstores import FAISS
 from langchain_classic.retrievers import EnsembleRetriever
 from langchain_core.documents import Document
@@ -67,13 +66,19 @@ chunks, vector_store = load_or_build_vector_store()
 
 dense_retriever = vector_store.as_retriever(search_kwargs={"k": 8})
 
-bm25_retriever = BM25Retriever.from_documents(chunks)
-bm25_retriever.k = 8
+try:
+    from langchain_community.retrievers import BM25Retriever
 
-retriever = EnsembleRetriever(
-    retrievers=[bm25_retriever, dense_retriever],
-    weights=[0.4, 0.6],
-)
+    bm25_retriever = BM25Retriever.from_documents(chunks)
+    bm25_retriever.k = 8
+    retriever = EnsembleRetriever(
+        retrievers=[bm25_retriever, dense_retriever],
+        weights=[0.4, 0.6],
+    )
+except ImportError as e:
+    bm25_retriever = None
+    retriever = dense_retriever
+    print(f"BM25 retriever unavailable ({e}) - falling back to dense retrieval only.")
 
 try:
     from sentence_transformers import CrossEncoder
