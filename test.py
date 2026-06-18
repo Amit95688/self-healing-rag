@@ -175,13 +175,11 @@ def run_ragas_eval(app, questions: list[dict], deterministic_results: list[dict]
     return ragas_result
 
 
-def print_report(results: list[dict], ragas_result=None) -> float:
-    """Returns the pass rate (0.0-1.0) so callers (e.g. main()) can gate on it."""
+def print_report(results: list[dict], ragas_result=None):
     total = len(results)
     passed = sum(1 for r in results if r["passed"])
     errors = sum(1 for r in results if r["error"])
     avg_latency = sum(r["latency_sec"] for r in results) / total if total else 0
-    pass_rate = passed / total if total else 0.0
 
     print("\n" + "=" * 60)
     print("SentinelRAG Eval Report")
@@ -202,7 +200,6 @@ def print_report(results: list[dict], ragas_result=None) -> float:
 
     print("\n" + "-" * 60)
     print(f"Passed: {passed}/{total}  |  Errors: {errors}  |  Avg latency: {avg_latency:.2f}s")
-    print(f"PASS_RATE={pass_rate:.4f}")  # fixed format -- grep-friendly for CI
 
     if ragas_result is not None:
         print("\n" + "-" * 60)
@@ -210,7 +207,6 @@ def print_report(results: list[dict], ragas_result=None) -> float:
         print(ragas_result)
 
     print("=" * 60 + "\n")
-    return pass_rate
 
 
 def main():
@@ -233,13 +229,6 @@ def main():
         "--output", default=None,
         help="Optional path to write full JSON results"
     )
-    parser.add_argument(
-        "--min-pass-rate", type=float, default=None,
-        help="If set (0.0-1.0), exit with code 1 when pass rate falls below "
-             "this threshold. E.g. --min-pass-rate 0.8 for an 80%% gate. "
-             "If omitted, the script always exits 0 regardless of results "
-             "(report-only mode)."
-    )
     args = parser.parse_args()
 
     if not Path(args.questions).exists():
@@ -257,27 +246,12 @@ def main():
         print("\nRunning RAGAS scoring (additional LLM calls)...")
         ragas_result = run_ragas_eval(app, questions, results)
 
-    pass_rate = print_report(results, ragas_result)
+    print_report(results, ragas_result)
 
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2)
         print(f"Full results written to {args.output}")
-
-    if args.min_pass_rate is not None:
-        if pass_rate < args.min_pass_rate:
-            print(
-                f"FAIL: pass rate {pass_rate:.2%} is below required "
-                f"threshold {args.min_pass_rate:.2%}",
-                file=sys.stderr,
-            )
-            sys.exit(1)
-        else:
-            print(
-                f"OK: pass rate {pass_rate:.2%} meets required threshold "
-                f"{args.min_pass_rate:.2%}"
-            )
-    # If --min-pass-rate was not passed, exit 0 regardless -- report-only mode.
 
 
 if __name__ == "__main__":

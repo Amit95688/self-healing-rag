@@ -8,4 +8,3 @@ python-dotenv
 faiss-cpu
 sentence-transformers
 ddgs
-rank_bm25
