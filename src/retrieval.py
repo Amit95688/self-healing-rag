@@ -121,4 +121,6 @@ def rerank_documents(question: str, docs: Sequence[Document]) -> List[Document]:
         print("  rerank top scores:", [round(float(score), 2) for _, score in scored_docs[:5]])
 
     relevant_docs = [doc for doc, score in scored_docs if score >= RERANK_MIN_SCORE][:TOP_N_RELEVANT]
+    if not relevant_docs and scored_docs:
+        relevant_docs = [doc for doc, _ in scored_docs[:TOP_N_RELEVANT]]
     return relevant_docs

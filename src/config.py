@@ -22,7 +22,7 @@ def _env_bool(name: str, default: bool = False) -> bool:
 # GitHub Actions sets CI=true; also allow explicit override.
 CI_MODE = _env_bool("CI") or _env_bool("SENTINEL_RAG_CI")
 if CI_MODE:
-    print("SentinelRAG CI fast mode: skipping verify, output guardrail, web fallback, and retries.")
+    print("SentinelRAG CI fast mode: skipping output guardrail, web fallback, and retries.")
 
 # ============================================================
 # FEATURE TOGGLES
@@ -38,7 +38,7 @@ TOP_N_RELEVANT = 2
 RERANK_MIN_SCORE = 0.0
 MAX_RETRIES = 0 if CI_MODE else 1
 MAX_REWRITE_TRIES = 0 if CI_MODE else 1
-SKIP_VERIFY = CI_MODE
+SKIP_VERIFY = False
 SKIP_OUTPUT_GUARDRAIL = CI_MODE
 
 # ============================================================

@@ -36,9 +36,11 @@ direct_generation_prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            "Answer using only your general knowledge.\n"
-            "If it requires specific details from the reference textbooks, say:\n"
-            "'I don't know based on my general knowledge.'",
+            "Answer using only your general knowledge about ML/AI.\n"
+            "If the question contains a false premise, asks about specific textbook content, "
+            "or cannot be answered confidently, respond with exactly:\n"
+            "'No answer found.'\n"
+            "Do NOT speculate or use outside knowledge for historical or biographical claims.",
         ),
         ("human", "{question}"),
     ]
@@ -86,8 +88,14 @@ rag_generation_prompt = ChatPromptTemplate.from_messages(
             "You are an ML/AI study assistant.\n\n"
             "You will receive a CONTEXT block from reference textbooks (deep learning, machine learning, statistics, AI systems).\n"
             "Answer the question using ONLY the context.\n"
-            "After each factual claim, add a citation tag like [Source: page X].\n"
-            "Do not mention 'context' in your answer. Be concise."
+            "After each factual claim, add a citation tag like [Source: page X].\n\n"
+            "Rules:\n"
+            "- Do NOT use outside knowledge, even if you know the answer.\n"
+            "- If CONTEXT lacks the information needed, respond with exactly: 'No answer found.'\n"
+            "- Do NOT hedge (e.g. 'the context does not mention...'). Either answer from CONTEXT or say 'No answer found.'\n"
+            "- If the question uses terminology not defined in CONTEXT, respond with exactly: 'No answer found.'\n"
+            "- For comparison questions, compare only what CONTEXT says about each topic.\n"
+            "Do not mention 'context' in your answer. Be concise.",
         ),
         ("human", "Question:\n{question}\n\nContext:\n{context}"),
     ]
