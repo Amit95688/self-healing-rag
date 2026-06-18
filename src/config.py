@@ -50,7 +50,7 @@ def _build_llm() -> ChatOpenAI:
         )
 
     return ChatOpenAI(
-        model=os.getenv("NVIDIA_MODEL", "qwen/qwen3-next-80b-a3-instruct"),
+        model=os.getenv("NVIDIA_MODEL", "qwen/qwen3-next-80b-a3b-instruct"),
         base_url=os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"),
         api_key=api_key,
         temperature=0,
