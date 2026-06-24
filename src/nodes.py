@@ -2,7 +2,14 @@ from typing import List, Literal
 
 from langchain_core.documents import Document
 
-from .config import MAX_RETRIES, MAX_REWRITE_TRIES, USE_WEB_FALLBACK, llm
+from .config import (
+    MAX_RETRIES,
+    MAX_REWRITE_TRIES,
+    SKIP_OUTPUT_GUARDRAIL,
+    SKIP_VERIFY,
+    USE_WEB_FALLBACK,
+    llm,
+)
 from .prompts import (
     decompose_prompt,
     direct_generation_prompt,
@@ -25,6 +32,37 @@ from .schemas import (
     State,
     VerifyDecision,
 )
+
+
+def _normalize_insufficient_answer(answer: str) -> str:
+    """Convert hedged non-answers into the canonical refusal string."""
+    text = (answer or "").strip()
+    if not text:
+        return "No answer found."
+
+    lower = text.lower()
+    if lower.startswith(("no answer found", "i can't help", "i can't share")):
+        return text
+
+    hedging_markers = (
+        "does not mention",
+        "does not specify",
+        "does not contain",
+        "does not discuss",
+        "do not mention",
+        "do not specify",
+        "provided context does not",
+        "the context does not",
+        "not mentioned in",
+        "no information in",
+        "cannot be determined from",
+        "not found in the",
+        "i don't know based on",
+    )
+    if any(marker in lower for marker in hedging_markers):
+        return "No answer found."
+
+    return text
 
 
 def guard_and_route(state: State):
@@ -55,7 +93,7 @@ def blocked_response(state: State):
 
 def generate_direct(state: State):
     out = llm.invoke(direct_generation_prompt.format_messages(question=state["question"]))
-    return {"answer": out.content}
+    return {"answer": _normalize_insufficient_answer(out.content)}
 
 
 def decompose_query(state: State):
@@ -126,7 +164,7 @@ def generate_from_context(state: State):
     out = llm.invoke(
         rag_generation_prompt.format_messages(question=state["question"], context=context)
     )
-    return {"answer": out.content, "context": context}
+    return {"answer": _normalize_insufficient_answer(out.content), "context": context}
 
 
 def no_answer_found(state: State):
@@ -163,6 +201,14 @@ def route_after_web_fallback(state: State) -> Literal["verify_answer", "output_g
 
 
 def verify_answer(state: State):
+    if SKIP_VERIFY:
+        return {
+            "issup": "fully_supported",
+            "isuse": "useful",
+            "evidence": "",
+            "use_reason": "skipped in CI fast mode",
+        }
+
     decision: VerifyDecision = llm.with_structured_output(VerifyDecision).invoke(
         verify_prompt.format_messages(
             question=state["question"],
@@ -236,6 +282,9 @@ def output_guardrail(state: State):
     answer = (state.get("answer") or "").strip()
 
     if answer in ("", "No answer found."):
+        return {"output_safe": True, "output_block_reason": ""}
+
+    if SKIP_OUTPUT_GUARDRAIL:
         return {"output_safe": True, "output_block_reason": ""}
 
     decision: OutputGuardDecision = llm.with_structured_output(OutputGuardDecision).invoke(

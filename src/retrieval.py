@@ -4,13 +4,12 @@ from pathlib import Path
 from typing import List, Sequence, Tuple
 
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.retrievers import BM25Retriever
 from langchain_community.vectorstores import FAISS
 from langchain_classic.retrievers import EnsembleRetriever
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from .config import CHUNKS_PATH, INDEX_PATH, RERANK_MIN_SCORE, TOP_N_RELEVANT, embeddings
+from .config import CHUNKS_PATH, INDEX_PATH, CI_MODE, RERANK_MIN_SCORE, TOP_N_RELEVANT, embeddings
 
 PDF_PATHS = [
     "./data/250153.pdf",
@@ -67,13 +66,19 @@ chunks, vector_store = load_or_build_vector_store()
 
 dense_retriever = vector_store.as_retriever(search_kwargs={"k": 8})
 
-bm25_retriever = BM25Retriever.from_documents(chunks)
-bm25_retriever.k = 8
+try:
+    from langchain_community.retrievers import BM25Retriever
 
-retriever = EnsembleRetriever(
-    retrievers=[bm25_retriever, dense_retriever],
-    weights=[0.4, 0.6],
-)
+    bm25_retriever = BM25Retriever.from_documents(chunks)
+    bm25_retriever.k = 8
+    retriever = EnsembleRetriever(
+        retrievers=[bm25_retriever, dense_retriever],
+        weights=[0.4, 0.6],
+    )
+except ImportError as e:
+    bm25_retriever = None
+    retriever = dense_retriever
+    print(f"BM25 retriever unavailable ({e}) - falling back to dense retrieval only.")
 
 try:
     from sentence_transformers import CrossEncoder
@@ -112,7 +117,10 @@ def rerank_documents(question: str, docs: Sequence[Document]) -> List[Document]:
     scores = reranker_model.predict(pairs)
     scored_docs = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)
 
-    print("  rerank top scores:", [round(float(score), 2) for _, score in scored_docs[:5]])
+    if not CI_MODE:
+        print("  rerank top scores:", [round(float(score), 2) for _, score in scored_docs[:5]])
 
     relevant_docs = [doc for doc, score in scored_docs if score >= RERANK_MIN_SCORE][:TOP_N_RELEVANT]
+    if not relevant_docs and scored_docs:
+        relevant_docs = [doc for doc, _ in scored_docs[:TOP_N_RELEVANT]]
     return relevant_docs

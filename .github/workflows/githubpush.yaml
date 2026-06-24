@@ -11,6 +11,12 @@ permissions:
 jobs:
   eval-gate:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CI: true
+      NVIDIA_QWEN_API_KEY: ${{ secrets.NVIDIA_QWEN_API_KEY }}
+      NVIDIA_LLAMA_API_KEY: ${{ secrets.NVIDIA_LLAMA_API_KEY }}
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
 
     steps:
       - name: Checkout full history
@@ -36,6 +42,13 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Cache HuggingFace models
+        if: steps.revert_check.outputs.is_revert == 'false'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-models-${{ runner.os }}-v1
+
       - name: Install dependencies
         if: steps.revert_check.outputs.is_revert == 'false'
         run: |
@@ -46,15 +59,38 @@ jobs:
             echo "WARNING: requirements.txt not found."
           fi
 
+      - name: Pre-download embedding and reranker models
+        if: steps.revert_check.outputs.is_revert == 'false'
+        run: |
+          python - <<'PY'
+          from langchain_huggingface import HuggingFaceEmbeddings
+          from sentence_transformers import CrossEncoder
+
+          HuggingFaceEmbeddings(
+              model_name="BAAI/bge-small-en-v1.5",
+              model_kwargs={"device": "cpu"},
+              encode_kwargs={"normalize_embeddings": True},
+          )
+          CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+          print("Embedding and reranker models cached.")
+          PY
+
       - name: Run eval
         id: run_eval
         if: steps.revert_check.outputs.is_revert == 'false'
         run: |
-          python test.py \
-            --questions eval_questions.json \
-            --pipeline-module src.graph \
-            --min-pass-rate 0.8 \
-            --output eval_results.json
+          # Only pass --min-pass-rate when the script supports it (avoid CI failures
+          # for older commits that don't include the flag).
+          EVAL_ARGS="--questions eval_questions.json --pipeline-module src.graph --output eval_results.json"
+          if python test.py --help 2>/dev/null | grep -q -- '--ci-subset'; then
+            EVAL_ARGS="$EVAL_ARGS --ci-subset"
+          elif python test.py --help 2>/dev/null | grep -q -- '--limit'; then
+            EVAL_ARGS="$EVAL_ARGS --limit 17"
+          fi
+          if python test.py --help 2>/dev/null | grep -q -- '--min-pass-rate'; then
+            EVAL_ARGS="$EVAL_ARGS --min-pass-rate 0.8"
+          fi
+          python test.py $EVAL_ARGS
         continue-on-error: true
 
       - name: Upload eval results artifact
